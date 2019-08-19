@@ -20,7 +20,7 @@ calculate_return <- function(asset_type = "General", equip_age = 20,
                          rep_cost = 500000, emerg_factor = 2, energy_savings = 15000,
                          rest_time = 200, biz_cont = 84, rev_supported=10000000, redundancy="N+1", regulatory="MINOR", 
                          regulatory_p = "MINIMAL", community = "MODERATE", community_p = "MINIMAL", health = "MINOR", 
-                         health_p = "MODERATE", cost_avoid = 0, cost_avoid_period = 3, prime_power=1, description="") {
+                         health_p = "MODERATE", cost_avoid = 0, cost_avoid_period = 3, description="") {
   #-------------------------------------
   # Inputs
   #-------------------------------------
@@ -99,7 +99,7 @@ calculate_return <- function(asset_type = "General", equip_age = 20,
   #function to return probability of failure based on asset condition in the given period. Uses the defined failure curve for a given
   #asset type
   pof <- function(x, red_fact, red_level) {
-    round((exp(1)^failure_curve$Mid)/(1+exp(1)^(failure_curve$Mid+failure_curve$bias+failure_curve$convexity*x))*red_fact^red_level*prime_power,2)
+    round((exp(1)^failure_curve$Mid)/(1+exp(1)^(failure_curve$Mid+failure_curve$bias+failure_curve$convexity*x))*red_fact^red_level,2)
   }
   
   

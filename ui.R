@@ -16,10 +16,7 @@ renderInputs <- function(prefix) {
              sliderInput(paste0(prefix, "_", "emerg_factor"), "Emergency Factor:", min = 0.0, max = 5.0, value = 2.0, step = 0.5),
              numericInput(paste0(prefix, "_", "energy_savings"), "Energy Savings (annual)", value=10000, width = NULL),
              numericInput(paste0(prefix, "_", "cost_avoid"), "Cost Avoidance", value=0, width = NULL),
-             sliderInput(paste0(prefix, "_", "cost_avoid_period"), "Period of Cost Avoided:", min = 1, max = 5, value = 3),
-             radioButtons(paste0(prefix, "_", "prime_power"), "Prime Power", choices = NULL, selected = NULL,
-                          inline = TRUE, width = NULL, choiceNames = c("NA", "NO", "YES"),
-                          choiceValues = c(1,1,2))
+             sliderInput(paste0(prefix, "_", "cost_avoid_period"), "Period of Cost Avoided:", min = 1, max = 5, value = 3)
       ),
       column(6,
              sliderInput(paste0(prefix, "_", "rest_time"), "Time to Restore (Hrs):", min = 1, max = 336, value = 5),
