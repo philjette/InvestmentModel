@@ -1,0 +1,6 @@
+Type,Min,Max,Mid,convexity,bias
+General,0,10,5,0.4,1
+Electronic,0,10,5,0.7,2.4
+Building_Infrastructure,0,10,5,0.1,2.5
+Batteries,0,10,5,1,1
+Generators,0,10,5,0.4,1
