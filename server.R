@@ -3,6 +3,16 @@ library(ggplot2)
 library(scales)
 library(DT)
 library(gridExtra)
+library(RMySQL)
+
+options(mysql = list(
+  "host" = "investmodeldb.cgdaj0ece9d8.us-east-2.rds.amazonaws.com",
+  "port" = 3306,
+  "user" = "investmodeldbadmin",
+  "password" = "rzL!-d25bj"
+))
+databaseName <- "investmodeldb"
+table <- "scored_assets_tbl"
 
 paramNames <- c("asset_type", "equip_age", "econ_life",
                 "cond_override", "rep_cost", "emerg_factor", "energy_savings",
@@ -199,6 +209,24 @@ plot_roi <- function(results) {
   #grid()
 }
 
+#function to save data to db
+saveData <- function(data) {
+  # Connect to the database
+  db <- dbConnect(MySQL(), dbname = databaseName, host = options()$mysql$host, 
+                  port = options()$mysql$port, user = options()$mysql$user, 
+                  password = options()$mysql$password)
+  # Construct the update query by looping over the data fields
+  query <- sprintf(
+    "INSERT INTO %s (%s) VALUES ('%s')",
+    table, 
+    paste(names(data), collapse = ", "),
+    paste(data, collapse = "', '")
+  )
+  # Submit the update query and disconnect
+  dbGetQuery(db, query)
+  dbDisconnect(db)
+}
+
 # Define server logic required to generate and plot a random distribution
 #
 # Idea and original code by Pierre Chretien
@@ -215,6 +243,12 @@ function(input, output, session) {
     names(params) <- paramNames
     params
   }
+  
+  # Whenever a field is filled, aggregate all form data
+  formData <- reactive({
+    data <- sapply(paste0(prefix, param_names), function(x) input[[x]])
+    data
+  })
   
   # Function that generates scenarios and computes NAV. The expression
   # is wrapped in a call to reactive to indicate that:
@@ -286,6 +320,10 @@ function(input, output, session) {
          write.csv(roiB(), con)
        }
      )
+  
+  observeEvent(input$save, {
+    saveData(formData())
+  })
 
   
 }

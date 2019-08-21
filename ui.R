@@ -1,4 +1,5 @@
 library(shiny)
+
 risk_levels <- c("LOW", "MINOR", "MODERATE", "SIGNIFICANT", "MAJOR", "CATASTROPHIC", "EXTREME")
 likelihood <- c("MINIMAL", "SOME", "MODERATE", "MAJOR", "SIGNIFICANT")
 
@@ -39,8 +40,9 @@ renderInputs <- function(prefix) {
       )
     ),
     p(downloadButton(paste0(prefix, "_", "downloadData"),
-                   "Download")
-      )
+                   "Download")),
+    p(actionButton(paste0(prefix, "_", "save"),
+                     "Save"))
   )
 }
 
