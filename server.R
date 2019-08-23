@@ -277,7 +277,7 @@ function(input, output, session) {
     paste("Expected condition: ",roiA()[1,13])
   })
   
-  output$resultsTable <- DT::renderDataTable({
+  output$resultsTable <- DT::renderDT({
     DT::datatable(
       select(roiA(), keeps)[1,], options = list(
       paging = FALSE, searching = FALSE, dom = 't'

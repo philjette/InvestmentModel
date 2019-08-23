@@ -60,7 +60,7 @@ fluidPage(theme="simplex.min.css",
             column(6, tags$h3("Investment Scenario"))
           ),
           fluidRow(
-            column(12, dataTableOutput('resultsTable'))	
+            column(12, DTOutput('resultsTable'))	
           ),
           fluidRow(
             column(12, renderInputs())
