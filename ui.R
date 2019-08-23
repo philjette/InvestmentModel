@@ -18,6 +18,8 @@ renderInputs <- function() {
              numericInput("energy_savings", "Energy Savings (annual)", value=10000, width = NULL),
              numericInput("cost_avoid", "Cost Avoidance", value=0, width = NULL),
              sliderInput("cost_avoid_period", "Period of Cost Avoided:", min = 1, max = 5, value = 3)
+             ,       
+             downloadButton("downloadData","Download")
       ),
       column(6,
              sliderInput("rest_time", "Time to Restore (Hrs):", min = 1, max = 336, value = 5),
@@ -37,11 +39,9 @@ renderInputs <- function() {
                          selected = NULL, multiple = FALSE, selectize = TRUE, width = NULL, size = NULL),
              selectInput("health_p", "Health & Safety Impact Likelihood", likelihood, 
                          selected = NULL, multiple = FALSE, selectize = TRUE, width = NULL, size = NULL)
+	     
       )
-    ),
-    p(downloadButton("downloadData",
-                   "Download")),
-    p(actionButton("save", "Save"))
+    )
   )
 }
 
@@ -57,10 +57,10 @@ fluidPage(theme="simplex.min.css",
           hr(),
           
           fluidRow(
-            column(12, tags$h3("Investment Scenario"))
+            column(6, tags$h3("Investment Scenario"))
           ),
-	        fluidRow(
-		        column(12, dataTableOutput('resultsTable'))	
+          fluidRow(
+            column(12, dataTableOutput('resultsTable'))	
           ),
           fluidRow(
             column(12, renderInputs())
