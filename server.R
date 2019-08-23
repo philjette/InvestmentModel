@@ -12,7 +12,7 @@ options(mysql = list(
   "password" = "rzL!-d25bj"
 ))
 databaseName <- "investmodeldb"
-table <- "scored_assets_tbl"
+table <- "results_tbl"
 
 paramNames <- c("asset_type", "equip_age", "econ_life",
                 "cond_override", "rep_cost", "emerg_factor", "energy_savings",
@@ -31,6 +31,7 @@ calculate_return <- function(asset_type = "General", equip_age = 20,
                          rest_time = 200, biz_cont = 84, rev_supported=10000000, redundancy="N+1", regulatory="MINOR", 
                          regulatory_p = "MINIMAL", community = "MODERATE", community_p = "MINIMAL", health = "MINOR", 
                          health_p = "MODERATE", cost_avoid = 0, cost_avoid_period = 3, description="") {
+  
   #-------------------------------------
   # Inputs
   #-------------------------------------
@@ -165,7 +166,7 @@ calculate_return <- function(asset_type = "General", equip_age = 20,
   #finally, bind the NPV into our DF
   results <- data.frame(cbind(results, npv))
   
-  results$desc <- desc
+  results$description <- desc
 
   return(results)
 }
@@ -235,10 +236,10 @@ saveData <- function(data) {
 function(input, output, session) {
   
   getParams <- function(prefix) {
-    input[[paste0(prefix, "_recalc")]]
+    input[["_recalc"]]
     
     params <- lapply(paramNames, function(p) {
-      input[[paste0(prefix, "_", p)]]
+      input[[p]]
     })
     names(params) <- paramNames
     params
@@ -246,7 +247,7 @@ function(input, output, session) {
   
   # Whenever a field is filled, aggregate all form data
   formData <- reactive({
-    data <- sapply(paste0(prefix, param_names), function(x) input[[x]])
+    data <- sapply(paramNames, function(x) input[[x]])
     data
   })
   
@@ -256,8 +257,7 @@ function(input, output, session) {
   #  1) It is "reactive" and therefore should be automatically
   #     re-executed when inputs change
   #
-  roiA <- reactive(do.call(calculate_return, getParams("a")))
-  roiB <- reactive(do.call(calculate_return, getParams("b")))
+  roiA <- reactive(do.call(calculate_return, getParams()))
   
   # Expression that plot NAV paths. The expression
   # is wrapped in a call to renderPlot to indicate that:
@@ -272,15 +272,9 @@ function(input, output, session) {
   output$a_distPlot <- renderPlot({
     plot_roi(roiA())
   })
-  output$b_distPlot <- renderPlot({
-    plot_roi(roiB())
-  })
   
   output$a_expected_cond <- renderText({ 
     paste("Expected condition: ",roiA()[1,13])
-  })
-  output$b_expected_cond <- renderText({ 
-    paste("Expected condition: ",roiB()[1,13])
   })
   
   output$table_a <- DT::renderDataTable({
@@ -293,18 +287,8 @@ function(input, output, session) {
       rownames= FALSE
     ) %>% formatCurrency(5,'$') %>% formatPercentage(3:4,2)
   })
-  output$table_b <- DT::renderDataTable({
-    DT::datatable(
-      select(roiB(), keeps)[1,], options = list(
-        paging = FALSE, searching = FALSE, dom = 't'
-      ),
-      colnames = c('AHI', 'Expected AHI', 'PoF', 'ROI (1-year)', 'NPV (5-year)'),
-      class = 'cell-border stripe',
-      rownames= FALSE
-    ) %>% formatCurrency(5,'$') %>% formatPercentage(3:4,2)
-  })
-  
-  output$a_downloadData <- downloadHandler(
+
+  output$downloadData <- downloadHandler(
       filename = function() {
         paste('data-', Sys.Date(), '.csv', sep='')
       },
@@ -312,17 +296,14 @@ function(input, output, session) {
          write.csv(roiA(), con)
        }
      )
-  output$b_downloadData <- downloadHandler(
-      filename = function() {
-        paste('data-', Sys.Date(), '.csv', sep='')
-      },
-      content = function(con) {
-         write.csv(roiB(), con)
-       }
-     )
   
   observeEvent(input$save, {
-    saveData(formData())
+    write.csv(roiA(), "testfile.csv", row.names = F)
+    con <- dbConnect(MySQL(), dbname = databaseName, host = options()$mysql$host, 
+                    port = options()$mysql$port, user = options()$mysql$user, 
+                    password = options()$mysql$password)
+    dbWriteTable(con,"results_tbl",roiA()[1,],overwrite=F, append=T)
+    #saveData(formData())
   })
 
   
