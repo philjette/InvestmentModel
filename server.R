@@ -277,7 +277,7 @@ function(input, output, session) {
     paste("Expected condition: ",roiA()[1,13])
   })
   
-  output$table_a <- DT::renderDataTable({
+  output$resultsTable <- DT::renderDataTable({
     DT::datatable(
       select(roiA(), keeps)[1,], options = list(
       paging = FALSE, searching = FALSE, dom = 't'
@@ -298,11 +298,11 @@ function(input, output, session) {
      )
   
   observeEvent(input$save, {
-    write.csv(roiA(), "testfile.csv", row.names = F)
     con <- dbConnect(MySQL(), dbname = databaseName, host = options()$mysql$host, 
                     port = options()$mysql$port, user = options()$mysql$user, 
                     password = options()$mysql$password)
     dbWriteTable(con,"results_tbl",roiA()[1,],overwrite=F, append=T)
+    dbDisconnect(con)
     #saveData(formData())
   })
 
