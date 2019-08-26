@@ -1,4 +1,5 @@
 library(shiny)
+library(DT)
 
 risk_levels <- c("LOW", "MINOR", "MODERATE", "SIGNIFICANT", "MAJOR", "CATASTROPHIC", "EXTREME")
 likelihood <- c("MINIMAL", "SOME", "MODERATE", "MAJOR", "SIGNIFICANT")
